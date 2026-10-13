@@ -13,6 +13,8 @@ export const menu = [
   { id: 2, title: 'Pepperoni', image: 'pizza2.png', price: 0.0042, description: 'Spicy treat' },
 ];
 
+let nextId = 100;
+
 export interface MockOptions {
   orders?: Order[];
   failOrder?: boolean;
@@ -23,7 +25,6 @@ export interface MockOptions {
 // so creating or closing franchises and stores is reflected in later responses.
 export async function mockBackend(page: Page, options: MockOptions = {}) {
   let loggedInUser: User | undefined;
-  let nextId = 100;
   const orders: Order[] = options.orders ?? [];
   const franchises: Franchise[] = [
     {
@@ -67,6 +68,36 @@ export async function mockBackend(page: Page, options: MockOptions = {}) {
   await page.route('*/**/api/user/me', async (route) => {
     expect(route.request().method()).toBe('GET');
     await json(route, loggedInUser ?? null);
+  });
+
+  await page.route(/\/api\/user(\?.*)?$/, async (route) => {
+    expect(route.request().method()).toBe('GET');
+    const url = new URL(route.request().url());
+    const name = (url.searchParams.get('name') ?? '*').replaceAll('*', '').toLowerCase();
+    const limit = Number(url.searchParams.get('limit') ?? 10);
+    const page = Number(url.searchParams.get('page') ?? 0);
+    const matches = Object.values(users)
+      .filter((u) => u.name!.toLowerCase().includes(name))
+      .map(({ password, ...u }) => u);
+    await json(route, { users: matches.slice(page * limit, (page + 1) * limit), more: matches.length > (page + 1) * limit });
+  });
+
+  await page.route(/\/api\/user\/\d+$/, async (route) => {
+    if (route.request().method() === 'DELETE') {
+      const id = new URL(route.request().url()).pathname.split('/').pop();
+      const [email] = Object.entries(users).find(([, u]) => u.id === id)!;
+      delete users[email];
+      return json(route, { message: 'user deleted' });
+    }
+
+    expect(route.request().method()).toBe('PUT');
+    const req = route.request().postDataJSON();
+    const [oldEmail, existing] = Object.entries(users).find(([, u]) => u.id === req.id)!;
+    const user: User = { ...existing, name: req.name, email: req.email, password: req.password ?? existing.password };
+    delete users[oldEmail];
+    users[user.email!] = user;
+    loggedInUser = user;
+    await json(route, { user, token: 'abcdef' });
   });
 
   await page.route('*/**/api/order/menu', async (route) => {

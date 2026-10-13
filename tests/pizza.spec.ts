@@ -185,34 +185,34 @@ test('admin manages franchises', async ({ page }) => {
   await page.getByRole('link', { name: 'Admin' }).click();
 
   await expect(page.getByText("Mama Ricci's kitchen")).toBeVisible();
-  await expect(page.getByRole('table')).toContainText('LotaPizza');
-  await expect(page.getByRole('table')).toContainText('Fran Chisee');
-  await expect(page.getByRole('table')).toContainText('Springville');
+  await expect(page.getByRole('table', { name: 'Franchises' })).toContainText('LotaPizza');
+  await expect(page.getByRole('table', { name: 'Franchises' })).toContainText('Fran Chisee');
+  await expect(page.getByRole('table', { name: 'Franchises' })).toContainText('Springville');
 
   // Create a franchise
   await page.getByRole('button', { name: 'Add Franchise' }).click();
   await page.getByPlaceholder('franchise name').fill('SliceWorks');
   await page.getByPlaceholder('franchisee admin email').fill('f@jwt.com');
   await page.getByRole('button', { name: 'Create' }).click();
-  await expect(page.getByRole('table')).toContainText('SliceWorks');
+  await expect(page.getByRole('table', { name: 'Franchises' })).toContainText('SliceWorks');
 
   // Close a store
   await page.getByRole('row', { name: 'Spanish Fork' }).getByRole('button', { name: 'Close' }).click();
   await expect(page.getByRole('main')).toContainText('Spanish Fork');
   await page.getByRole('button', { name: 'Close' }).click();
-  await expect(page.getByRole('table')).not.toContainText('Spanish Fork');
+  await expect(page.getByRole('table', { name: 'Franchises' })).not.toContainText('Spanish Fork');
 
   // Close a franchise
   await page.getByRole('row', { name: 'SliceWorks' }).getByRole('button', { name: 'Close' }).click();
   await expect(page.getByRole('main')).toContainText('SliceWorks');
   await page.getByRole('button', { name: 'Close' }).click();
-  await expect(page.getByRole('table')).not.toContainText('SliceWorks');
+  await expect(page.getByRole('table', { name: 'Franchises' })).not.toContainText('SliceWorks');
 
   // Filter narrows the list
   await page.getByPlaceholder('Filter franchises').fill('corp');
   await page.getByRole('button', { name: 'Submit' }).click();
-  await expect(page.getByRole('table')).toContainText('PizzaCorp');
-  await expect(page.getByRole('table')).not.toContainText('LotaPizza');
+  await expect(page.getByRole('table', { name: 'Franchises' })).toContainText('PizzaCorp');
+  await expect(page.getByRole('table', { name: 'Franchises' })).not.toContainText('LotaPizza');
 
   // Cancel out of create
   await page.getByRole('button', { name: 'Add Franchise' }).click();
@@ -233,11 +233,11 @@ test('admin dashboard pagination', async ({ page }) => {
     await expect(page.getByText("Mama Ricci's kitchen")).toBeVisible();
   }
 
-  await expect(page.getByRole('table')).not.toContainText('Fourth');
+  await expect(page.getByRole('table', { name: 'Franchises' })).not.toContainText('Fourth');
   await page.getByRole('button', { name: '»' }).click();
-  await expect(page.getByRole('table')).toContainText('Fourth');
+  await expect(page.getByRole('table', { name: 'Franchises' })).toContainText('Fourth');
   await page.getByRole('button', { name: '«' }).click();
-  await expect(page.getByRole('table')).toContainText('LotaPizza');
+  await expect(page.getByRole('table', { name: 'Franchises' })).toContainText('LotaPizza');
 });
 
 test('admin dashboard hidden from diners', async ({ page }) => {
