@@ -1,0 +1,6 @@
+none   round 1 | req/s   386 | avg   51.5 ms | p95   73.8 ms | failed 0.0%
+all    round 1 | req/s   295 | avg   67.4 ms | p95   99.0 ms | failed 0.0%
+tenth  round 1 | req/s   317 | avg   62.8 ms | p95   89.6 ms | failed 0.0%
+none   round 2 | req/s   374 | avg   53.1 ms | p95   76.8 ms | failed 0.0%
+all    round 2 | req/s   300 | avg   66.3 ms | p95   95.3 ms | failed 0.0%
+tenth  round 2 | req/s   325 | avg   61.1 ms | p95   88.1 ms | failed 0.0%
